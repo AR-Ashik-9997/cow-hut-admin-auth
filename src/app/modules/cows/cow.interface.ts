@@ -29,10 +29,10 @@ export type ICow = {
 export type CowModel = Model<ICow, Record<string, unknown>>;
 
 export type ICowFilter = {
-  searchTerm?: string; 
+  searchTerm?: string;
   id?: string;
-  name?: string;  
-  location?: string;  
+  name?: string;
+  location?: string;
   label?: string;
   breed?: string;
   category?: string;

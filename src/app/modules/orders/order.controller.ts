@@ -6,7 +6,7 @@ import sendResponse from '../../../shared/sendResponseApi';
 import { IOrder } from './order.interface';
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
-  const {...orderData } = req.body;
+  const { ...orderData } = req.body;
   const result = await OrderService.createOrder(orderData);
   sendResponse<IOrder>(res, {
     success: true,
@@ -26,4 +26,4 @@ const getAllOrders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const OrderController = { createOrder,getAllOrders };
+export const OrderController = { createOrder, getAllOrders };

@@ -55,7 +55,7 @@ const createOrder = async (orderData: IOrder): Promise<IOrder> => {
     await session.abortTransaction();
     await session.endSession();
     throw error;
-  }   
+  }
   return newOrder;
 };
 
@@ -64,4 +64,4 @@ const getAllOrders = async (): Promise<IOrder[] | null> => {
   return result;
 };
 
-export const OrderService = { createOrder,getAllOrders };
+export const OrderService = { createOrder, getAllOrders };

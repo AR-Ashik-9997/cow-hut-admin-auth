@@ -1,8 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IUser, UserModel } from './user.interface';
 import { role } from './user.constant';
-import ApiError from '../../../eroors/apiErrorHandler';
-import httpStatus from 'http-status';
 
 const userSchema = new Schema<IUser, UserModel>(
   {
@@ -29,7 +27,7 @@ const userSchema = new Schema<IUser, UserModel>(
 );
 // userSchema.pre('save', async function (next) {
 //   const isExist = await User.findOne({
-//     phoneNumber: this.phoneNumber    
+//     phoneNumber: this.phoneNumber
 //   });
 //   if (isExist) {
 //     throw new ApiError(

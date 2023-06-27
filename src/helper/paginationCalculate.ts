@@ -13,7 +13,7 @@ type IOptionsResult = {
   sortBy: string;
   sortOrder: SortOrder;
 };
-const paginationCalculate = (options: IOptions):IOptionsResult => {
+const paginationCalculate = (options: IOptions): IOptionsResult => {
   const page = Number(options.page || 1);
   const limit = Number(options.limit || 10);
   const skip = (page - 1) * limit;

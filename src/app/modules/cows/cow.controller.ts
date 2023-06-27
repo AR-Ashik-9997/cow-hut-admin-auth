@@ -8,18 +8,16 @@ import pick from '../../../shared/pickPagination';
 import { paginationField } from '../../../shared/constants';
 import { CowFilterableFields } from './cow.constant';
 
-const createCow = catchAsync(
-  async (req: Request, res: Response) => {
-    const { ...cowData } = req.body;
-    const result = await CowService.createCow(cowData);
-    sendResponse<ICow>(res, {
-      success: true,
-      statusCode: httpStatus.OK,
-      message: 'Cow created successfully',
-      data: result,
-    }); 
-  }
-);
+const createCow = catchAsync(async (req: Request, res: Response) => {
+  const { ...cowData } = req.body;
+  const result = await CowService.createCow(cowData);
+  sendResponse<ICow>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Cow created successfully',
+    data: result,
+  });
+});
 
 const getAllCows = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, CowFilterableFields);

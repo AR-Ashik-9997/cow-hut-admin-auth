@@ -1,7 +1,6 @@
 import { IUser } from './user.interface';
 import { User } from './user.model';
 
-
 const getAllUsers = async (): Promise<IUser[] | null> => {
   const result = await User.find();
   return result;

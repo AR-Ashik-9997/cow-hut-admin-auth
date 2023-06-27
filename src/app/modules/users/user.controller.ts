@@ -48,7 +48,7 @@ const deleteSingleUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const UserController = { 
+export const UserController = {
   getAllUsers,
   getSingleUser,
   updateSingleUser,

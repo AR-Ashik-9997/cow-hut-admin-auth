@@ -1,6 +1,11 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { Schema, model } from 'mongoose';
 import { AdminModel, IAdmin } from './admin.interface';
 import { role } from './admin.constant';
+import ApiError from '../../../eroors/apiErrorHandler';
+import httpStatus from 'http-status';
+import bcrypt from 'bcrypt';
+import config from '../../../config';
 
 const adminSchema = new Schema<IAdmin, AdminModel>(
   {
@@ -23,6 +28,20 @@ const adminSchema = new Schema<IAdmin, AdminModel>(
     },
   }
 );
+adminSchema.pre('save', async function (next) {
+  const admin = this;
+  const isExist = await Admin.findOne({
+    phoneNumber: this.phoneNumber,
+  });
+  admin.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_round)
+  );
+  if (isExist) {
+    throw new ApiError(httpStatus.CONFLICT, 'phoneNumber is already exists !');
+  }
+  next();
+});
 
 adminSchema.set('toJSON', {
   transform: function (doc, ret) {
@@ -30,4 +49,16 @@ adminSchema.set('toJSON', {
     return ret;
   },
 });
+
+adminSchema.methods.isExistPhoneNumber = async function (
+  phoneNumber: string
+): Promise<Partial<IAdmin> | null> {
+  return await Admin.findOne({ phoneNumber }, { _id: 1, role: 1 }).lean();
+};
+adminSchema.methods.isPasswordMatched = async function (
+  givenPassword: string,
+  savePassword: string
+): Promise<boolean> {
+  return bcrypt.compare(givenPassword, savePassword);
+};
 export const Admin = model<IAdmin, AdminModel>('Admin', adminSchema);

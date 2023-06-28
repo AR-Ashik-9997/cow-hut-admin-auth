@@ -5,5 +5,8 @@ const createAdmin = async (payload: IAdmin): Promise<IAdmin> => {
   const result = await Admin.create(payload);
   return result;
 };
+const LoginUser = async (payload: string) => {
+  return payload;
+};
 
-export const AdminService = { createAdmin };
+export const AdminService = { createAdmin, LoginUser };

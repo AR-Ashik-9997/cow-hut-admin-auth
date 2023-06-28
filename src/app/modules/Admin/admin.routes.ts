@@ -9,5 +9,10 @@ router.post(
   requestValidation(AdminValidation.createAdminzodValidationSchema),
   AdminController.createAdmin
 );
+router.post(
+  '/login',
+  requestValidation(AdminValidation.adminLoginzodValidationSchema),
+  AdminController.LoginUser
+);
 
 export const AdminRoutes = router;

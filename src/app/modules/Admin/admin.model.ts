@@ -1,13 +1,14 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Schema, model } from 'mongoose';
-import { AdminModel, IAdmin } from './admin.interface';
+import { AdminModel, IAdmin, ILoginMethod } from './admin.interface';
 import { role } from './admin.constant';
 import ApiError from '../../../eroors/apiErrorHandler';
 import httpStatus from 'http-status';
 import bcrypt from 'bcrypt';
 import config from '../../../config';
 
-const adminSchema = new Schema<IAdmin, AdminModel>(
+const adminSchema = new Schema<IAdmin, Record<string, never>, ILoginMethod>(
   {
     password: { type: String, required: true, select: false },
     role: { type: String, enum: role },
@@ -53,12 +54,6 @@ adminSchema.set('toJSON', {
 adminSchema.methods.isExistPhoneNumber = async function (
   phoneNumber: string
 ): Promise<Partial<IAdmin> | null> {
-  return await Admin.findOne({ phoneNumber }, { _id: 1, role: 1 }).lean();
-};
-adminSchema.methods.isPasswordMatched = async function (
-  givenPassword: string,
-  savePassword: string
-): Promise<boolean> {
-  return bcrypt.compare(givenPassword, savePassword);
+  return await Admin.findOne({ phoneNumber }, { role: 1, password: 1 }).lean();
 };
 export const Admin = model<IAdmin, AdminModel>('Admin', adminSchema);

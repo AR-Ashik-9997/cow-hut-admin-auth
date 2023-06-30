@@ -14,17 +14,8 @@ export type IAdmin = {
   address: string;
 };
 
-export type ILoginResponse = {
-  accessToken: string;
-  refreshToken?: string;
-};
-
 export type ILoginMethod = {
   isExistPhoneNumber(phoneNumber: string): Promise<Partial<IAdmin> | null>;
-  isPasswordMatched(
-    givenPassword: string,
-    savePassword: string
-  ): Promise<boolean>;
 };
 
 export type AdminModel = Model<IAdmin, Record<string, unknown>, ILoginMethod>;

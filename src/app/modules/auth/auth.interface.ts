@@ -1,4 +1,4 @@
-export type IAdminRefreshTokenResponse = {
+export type IRefreshTokenResponse = {
   accessToken: string;
 };
 
@@ -7,7 +7,7 @@ export type ILoginUser = {
   password: string;
 };
 
-export type ILoginResponse = {
+export type IUserLoginResponse = {
   accessToken: string;
   refreshToken?: string;
 };

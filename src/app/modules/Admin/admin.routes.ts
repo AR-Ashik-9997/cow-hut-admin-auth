@@ -12,7 +12,7 @@ router.post(
 router.post(
   '/login',
   requestValidation(AdminValidation.adminLoginzodValidationSchema),
-  AdminController.LoginUser
+  AdminController.LoginAdmin
 );
 
 export const AdminRoutes = router;

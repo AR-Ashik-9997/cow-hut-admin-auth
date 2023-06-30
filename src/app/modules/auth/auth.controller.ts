@@ -5,7 +5,7 @@ import sendResponse from '../../../shared/sendResponseApi';
 import httpStatus from 'http-status';
 import { IUser } from '../users/user.interface';
 import config from '../../../config';
-import { IAdminRefreshTokenResponse, ILoginResponse } from './auth.interface';
+import { IRefreshTokenResponse, IUserLoginResponse } from './auth.interface';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const { ...userData } = req.body;
@@ -27,7 +27,7 @@ const LoginUser = catchAsync(async (req: Request, res: Response) => {
     httpOnly: true,
   };
   res.cookie('refreshToken', refreshToken, cookie);
-  sendResponse<ILoginResponse>(res, {
+  sendResponse<IUserLoginResponse>(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'User logged in successfully',
@@ -46,7 +46,7 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
   res.cookie('refreshToken', refreshToken, cookieOptions);
 
-  sendResponse<IAdminRefreshTokenResponse>(res, {
+  sendResponse<IRefreshTokenResponse>(res, {
     statusCode: 200,
     success: true,
     message: 'User loggedin successfully !',

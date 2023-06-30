@@ -17,5 +17,13 @@ export type IAdmin = {
 export type ILoginMethod = {
   isExistPhoneNumber(phoneNumber: string): Promise<Partial<IAdmin> | null>;
 };
+export type ILoginAdmin = {
+  phoneNumber: string;
+  password: string;
+};
 
+export type IAdminLoginResponse = {
+  accessToken: string;
+  refreshToken?: string;
+};
 export type AdminModel = Model<IAdmin, Record<string, unknown>, ILoginMethod>;

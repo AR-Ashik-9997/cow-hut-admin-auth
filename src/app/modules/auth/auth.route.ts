@@ -13,7 +13,7 @@ router.post(
 );
 router.post(
   '/login',
-  requestValidation(AuthValidation.adminLoginzodValidationSchema),
+  requestValidation(AuthValidation.UserLoginzodValidationSchema),
   authController.LoginUser
 );
 router.post(

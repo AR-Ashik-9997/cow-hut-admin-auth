@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export type userName = {
@@ -14,5 +15,7 @@ export type IUser = {
   budget: number;
   income: number;
 };
-
-export type UserModel = Model<IUser, Record<string, unknown>>;
+export type IUserLoginMethod = {
+  isExistPhoneNumber(phoneNumber: string): Promise<Partial<IUser> | null>;
+};
+export type UserModel = Model<IUser, Record<string, unknown>, IUserLoginMethod>;

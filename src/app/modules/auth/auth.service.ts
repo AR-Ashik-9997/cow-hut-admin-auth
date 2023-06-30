@@ -7,9 +7,9 @@ import ApiError from '../../../eroors/apiErrorHandler';
 import httpStatus from 'http-status';
 import { Admin } from '../Admin/admin.model';
 import {
-  IAdminRefreshTokenResponse,
-  ILoginResponse,
   ILoginUser,
+  IRefreshTokenResponse,
+  IUserLoginResponse,
 } from './auth.interface';
 import bcrypt from 'bcrypt';
 
@@ -28,7 +28,7 @@ const createUser = async (payload: IUser): Promise<IUser> => {
   }
 };
 
-const LoginUser = async (payload: ILoginUser): Promise<ILoginResponse> => {
+const LoginUser = async (payload: ILoginUser): Promise<IUserLoginResponse> => {
   const { phoneNumber, password } = payload;
   const adminUser = new Admin();
   const isExistUser = await adminUser.isExistPhoneNumber(phoneNumber);
@@ -60,9 +60,7 @@ const LoginUser = async (payload: ILoginUser): Promise<ILoginResponse> => {
   return { accessToken, refreshToken };
 };
 
-const RefreshToken = async (
-  token: string
-): Promise<IAdminRefreshTokenResponse> => {
+const RefreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   let verified = null;
   try {
     verified = jwtHelper.verifyToken(
@@ -72,18 +70,33 @@ const RefreshToken = async (
   } catch (err) {
     throw new ApiError(httpStatus.FORBIDDEN, 'invalid refresh token');
   }
-  const { adminId } = verified;
-  const isExistUser = await Admin.findById(adminId);
-  if (!isExistUser) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'user does not exist');
+
+  const { _id, role } = verified;
+  if (role !== 'admin') {
+    const isExistUser = await User.findById(_id);
+    if (!isExistUser) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    const { _id: id, role } = isExistUser;
+    const newAccessToken = jwtHelper.createToken(
+      { id, role },
+      config.jwt.secret as Secret,
+      config.jwt.expires_in as string
+    );
+    return { accessToken: newAccessToken };
+  } else {
+    const isExistUser = await Admin.findById(_id);
+    if (!isExistUser) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+    const { _id: id, role } = isExistUser;
+    const newAccessToken = jwtHelper.createToken(
+      { id, role },
+      config.jwt.secret as Secret,
+      config.jwt.expires_in as string
+    );
+    return { accessToken: newAccessToken };
   }
-  const { _id, role } = isExistUser;
-  const newAccessToken = jwtHelper.createToken(
-    { _id, role },
-    config.jwt.secret as Secret,
-    config.jwt.expires_in as string
-  );
-  return { accessToken: newAccessToken };
 };
 
 export const authService = { createUser, LoginUser, RefreshToken };

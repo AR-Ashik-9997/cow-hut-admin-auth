@@ -19,7 +19,13 @@ const createAdminzodValidationSchema = z.object({
     address: z.string({ required_error: 'address is required' }),
   }),
 });
-
+const adminLoginzodValidationSchema = z.object({
+  body: z.object({
+    password: z.string({ required_error: 'password is required' }),
+    phoneNumber: z.string({ required_error: 'phone number is required' }),
+  }),
+});
 export const AdminValidation = {
   createAdminzodValidationSchema,
+  adminLoginzodValidationSchema,
 };

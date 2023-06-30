@@ -7,7 +7,7 @@ const refreshTokenZodSchema = z.object({
     }),
   }),
 });
-const adminLoginzodValidationSchema = z.object({
+const UserLoginzodValidationSchema = z.object({
   body: z.object({
     password: z.string({ required_error: 'password is required' }),
     phoneNumber: z.string({ required_error: 'phone number is required' }),
@@ -16,5 +16,5 @@ const adminLoginzodValidationSchema = z.object({
 
 export const AuthValidation = {
   refreshTokenZodSchema,
-  adminLoginzodValidationSchema,
+  UserLoginzodValidationSchema,
 };

@@ -48,9 +48,37 @@ const deleteSingleUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const authorization = req.headers.authorization;
+  const result = await UserService.getMyProfile(authorization as string);
+  sendResponse<IUser>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User's information retrieved successfully",
+    data: result,
+  });
+});
+
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const authorization = req.headers.authorization;
+  const updatedData = req.body;
+  const result = await UserService.updateMyProfile(
+    authorization as string,
+    updatedData
+  );
+  sendResponse<IUser>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User's information retrieved successfully",
+    data: result,
+  });
+});
+
 export const UserController = {
   getAllUsers,
   getSingleUser,
   updateSingleUser,
   deleteSingleUser,
+  getMyProfile,
+  updateMyProfile,
 };

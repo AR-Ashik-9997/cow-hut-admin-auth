@@ -49,4 +49,10 @@ userSchema.methods.isExistPhoneNumber = async function (
 ): Promise<Partial<IUser> | null> {
   return await User.findOne({ phoneNumber }, { role: 1, password: 1 }).lean();
 };
+userSchema.set('toJSON', {
+  transform: function (doc, ret) {
+    delete ret.password; // Exclude the password field from the response
+    return ret;
+  },
+});
 export const User = model<IUser, UserModel>('User', userSchema);

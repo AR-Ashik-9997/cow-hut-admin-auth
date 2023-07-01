@@ -15,6 +15,7 @@ export type IUser = {
   budget: number;
   income: number;
 };
+
 export type IUserLoginMethod = {
   isExistPhoneNumber(phoneNumber: string): Promise<Partial<IUser> | null>;
 };

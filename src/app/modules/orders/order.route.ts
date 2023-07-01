@@ -8,8 +8,8 @@ const router = express.Router();
 
 router.post(
   '/',
-  auth(ENUM_USER_ROLE.BUYER),
   requestValidation(OrderValidation.createOrderzodValidationSchema),
+  auth(ENUM_USER_ROLE.BUYER),
   OrderController.createOrder
 );
 router.get('/', auth(ENUM_USER_ROLE.ADMIN), OrderController.getAllOrders);

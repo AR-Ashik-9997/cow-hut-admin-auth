@@ -30,8 +30,8 @@ const createUser = async (payload: IUser): Promise<IUser> => {
 
 const LoginUser = async (payload: ILoginUser): Promise<IUserLoginResponse> => {
   const { phoneNumber, password } = payload;
-  const adminUser = new Admin();
-  const isExistUser = await adminUser.isExistPhoneNumber(phoneNumber);
+  const user = new User();
+  const isExistUser = await user.isExistPhoneNumber(phoneNumber);
   if (!isExistUser) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
@@ -42,18 +42,18 @@ const LoginUser = async (payload: ILoginUser): Promise<IUserLoginResponse> => {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'password is incorrect');
   }
 
-  const { _id: adminId } = (await Admin.findOne(
+  const { _id } = (await User.findOne(
     { phoneNumber: phoneNumber },
     { _id: 1 }
   ).lean()) as { _id: string };
   const { role } = isExistUser;
   const accessToken = jwtHelper.createToken(
-    { adminId, role },
+    { _id, role },
     config.jwt.secret as Secret,
     config.jwt.expires_in as string
   );
   const refreshToken = jwtHelper.createToken(
-    { adminId, role },
+    { _id, role },
     config.jwt.refresh_secret as Secret,
     config.jwt.refresh_expires_in as string
   );

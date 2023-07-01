@@ -7,11 +7,17 @@ import { ENUM_USER_ROLE } from '../../enum/user';
 const router = express.Router();
 
 router.get('/', auth(ENUM_USER_ROLE.ADMIN), UserController.getAllUsers);
+router.get('/my-profile', UserController.getMyProfile);
 router.get('/:id', auth(ENUM_USER_ROLE.ADMIN), UserController.getSingleUser);
 router.patch(
+  '/my-profile',
+  requestValidation(UserValidation.updateUserProfilezodValidationSchema),
+  UserController.updateMyProfile
+);
+router.patch(
   '/:id',
-  auth(ENUM_USER_ROLE.ADMIN),
   requestValidation(UserValidation.updateUserzodValidationSchema),
+  auth(ENUM_USER_ROLE.ADMIN),
   UserController.updateSingleUser
 );
 router.delete(
@@ -19,4 +25,5 @@ router.delete(
   auth(ENUM_USER_ROLE.ADMIN),
   UserController.deleteSingleUser
 );
+
 export const UserRoutes = router;

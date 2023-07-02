@@ -1,4 +1,4 @@
-import mongoose, { startSession } from 'mongoose';
+import { startSession } from 'mongoose';
 import { IOrder } from './order.interface';
 import { Cow } from '../cows/cow.model';
 import { User } from '../users/user.model';
@@ -21,6 +21,9 @@ const createOrder = async (orderData: IOrder): Promise<IOrder> => {
     if (!cowDocument || !buyerDocument) {
       throw new Error('Invalid cow or buyer.');
     }
+    if (cowDocument.label === 'sold out') {
+      throw new Error('Cow is sold out');
+    }
     if (buyerDocument.budget < cowDocument.price) {
       throw new Error(
         'Insufficient funds. Please add more money to your account.'
@@ -29,7 +32,11 @@ const createOrder = async (orderData: IOrder): Promise<IOrder> => {
     cowDocument.label = 'sold out';
     await cowDocument.save();
     buyerDocument.budget -= cowDocument.price;
-    await buyerDocument.save();
+    await User.findByIdAndUpdate(
+      { _id: buyer },
+      { budget: buyerDocument.budget },
+      { new: true }
+    );
 
     const sellerDocument = await User.findById(cowDocument.seller).session(
       session
@@ -38,11 +45,16 @@ const createOrder = async (orderData: IOrder): Promise<IOrder> => {
       throw new Error('Invalid seller.');
     }
     sellerDocument.income += cowDocument.price;
-    await sellerDocument.save();
+    await User.findByIdAndUpdate(
+      { _id: cowDocument.seller },
+      { income: sellerDocument.income },
+      { new: true }
+    );
 
     const order = new Order({
       cow: cowDocument._id,
       buyer: buyerDocument._id,
+      seller: sellerDocument._id,
     });
     await order.save();
     if (!Object.keys(order).length) {
@@ -59,8 +71,29 @@ const createOrder = async (orderData: IOrder): Promise<IOrder> => {
   return newOrder;
 };
 
-const getAllOrders = async (): Promise<IOrder[] | null> => {
-  const result = await Order.find().populate('buyer').populate('cow');
+const getAllOrders = async (
+  userId: string,
+  role: string
+): Promise<IOrder[] | IOrder | null> => {
+  let result = null;
+  if (role === 'admin') {
+    result = await Order.find({})
+      .populate('buyer')
+      .populate('seller')
+      .populate('cow');
+  }
+  if (role === 'buyer') {
+    result = await Order.find({ buyer: userId })
+      .populate('buyer')
+      .populate('seller')
+      .populate('cow');
+  }
+  if (role === 'seller') {
+    result = await Order.findOne({ seller: userId })
+      .populate('buyer')
+      .populate('seller')
+      .populate('cow');
+  }
   return result;
 };
 
@@ -68,8 +101,8 @@ const getOrderById = async (
   orderId: string,
   userId: string,
   role: string
-): Promise<IOrder[] | null> => {
-  let result: IOrder[] | null = null;
+): Promise<IOrder[] | IOrder | null> => {
+  let result = null;
   const isExistOrder = await Order.findById(orderId);
   if (!isExistOrder) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Order not found');
@@ -77,18 +110,15 @@ const getOrderById = async (
   if (isExistOrder && role === 'admin') {
     result = await Order.find().populate('buyer').populate('cow');
   } else if (isExistOrder && role === 'buyer') {
-    if (isExistOrder.buyer !== new mongoose.Types.ObjectId(userId)) {
+    if (isExistOrder && !isExistOrder.buyer.equals(userId)) {
       throw new ApiError(httpStatus.FORBIDDEN, 'your order not found');
     }
-    result = await Order.findOne({ _id: orderId, buyer: userId })
+    result = await Order.findOne({ _id: orderId })
       .populate('buyer')
-      .populate('cow');
+      .populate('cow')
+      .populate('seller');
   } else if (isExistOrder && role === 'seller') {
-    const cow = await Cow.findOne({ _id: isExistOrder?.cow?._id });
-    if (!cow) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Cow not found');
-    }
-    if (cow?.seller !== new mongoose.Types.ObjectId(userId)) {
+    if (isExistOrder && !isExistOrder.seller.equals(userId)) {
       throw new ApiError(
         httpStatus.FORBIDDEN,
         'You are not authorized to perform this action'
@@ -96,6 +126,7 @@ const getOrderById = async (
     } else {
       result = await Order.findOne({ _id: orderId })
         .populate('buyer')
+        .populate('seller')
         .populate('cow');
     }
   }

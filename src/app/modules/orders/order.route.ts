@@ -12,7 +12,11 @@ router.post(
   auth(ENUM_USER_ROLE.BUYER),
   OrderController.createOrder
 );
-router.get('/', auth(ENUM_USER_ROLE.ADMIN), OrderController.getAllOrders);
+router.get(
+  '/',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.SELLER),
+  OrderController.getAllOrders
+);
 router.get(
   '/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.SELLER),

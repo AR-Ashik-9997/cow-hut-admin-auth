@@ -17,8 +17,10 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllOrders = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderService.getAllOrders();
-  sendResponse<IOrder[]>(res, {
+  const userId = req?.user?._id;
+  const userRole = req?.user?.role;
+  const result = await OrderService.getAllOrders(userId, userRole);
+  sendResponse<IOrder[] | IOrder>(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Orders retrieved successfully',
@@ -30,10 +32,10 @@ const getOrderById = catchAsync(async (req: Request, res: Response) => {
   const userId = req?.user?._id;
   const userRole = req?.user?.role;
   const result = await OrderService.getOrderById(id, userId, userRole);
-  sendResponse<IOrder[]>(res, {
+  sendResponse<IOrder[] | IOrder>(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Orders retrieved successfully',
+    message: 'Order information retrieved successfully',
     data: result,
   });
 });

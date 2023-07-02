@@ -36,8 +36,8 @@ const LoginUser = async (payload: ILoginUser): Promise<IUserLoginResponse> => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
   if (
-    isExistUser.password &&
-    !(await bcrypt.compare(password, isExistUser.password))
+    isExistUser?.password &&
+    !(await bcrypt.compare(password, isExistUser?.password))
   ) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'password is incorrect');
   }

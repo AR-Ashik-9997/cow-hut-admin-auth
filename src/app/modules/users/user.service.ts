@@ -1,10 +1,11 @@
 import httpStatus from 'http-status';
 import ApiError from '../../../eroors/apiErrorHandler';
 import { IUser } from './user.interface';
+
 import { User } from './user.model';
-import { jwtHelper } from '../../../helper/jwtHelper';
+
 import config from '../../../config';
-import { Secret } from 'jsonwebtoken';
+
 import bcrypt from 'bcrypt';
 
 const getAllUsers = async (): Promise<IUser[] | null> => {
@@ -31,35 +32,25 @@ const deleteSingleUser = async (id: string): Promise<IUser | null> => {
   return result;
 };
 
-const getMyProfile = async (token: string): Promise<IUser | null> => {
-  if (!token) {
-    throw new ApiError(httpStatus.FORBIDDEN, 'Access token is required');
-  }
-  let verifiedUser = null;
-  verifiedUser = jwtHelper.verifyToken(token, config.jwt.secret as Secret);
+const getMyProfile = async (id: string): Promise<IUser | null> => {
+  const verifiedUser = await User.findById(id);
   if (!verifiedUser) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'you are not authorized');
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  const { _id } = verifiedUser;
   const result = await User.findOne(
-    { _id },
+    { _id: id },
     { name: 1, phoneNumber: 1, address: 1 }
   ).lean();
   return result;
 };
 const updateMyProfile = async (
-  token: string,
+  id: string,
   payload: Partial<IUser>
 ): Promise<IUser | null> => {
-  if (!token) {
-    throw new ApiError(httpStatus.FORBIDDEN, 'Access token is required');
-  }
-  let verifiedUser = null;
-  verifiedUser = jwtHelper.verifyToken(token, config.jwt.secret as Secret);
+  const verifiedUser = await User.findById(id);
   if (!verifiedUser) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'you are not authorized');
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
-  const { _id: id } = verifiedUser;
   if (payload.password) {
     const hashedPassword = await bcrypt.hash(
       payload.password,

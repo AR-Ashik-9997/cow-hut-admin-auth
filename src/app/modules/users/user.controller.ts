@@ -49,8 +49,8 @@ const deleteSingleUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const authorization = req.headers.authorization;
-  const result = await UserService.getMyProfile(authorization as string);
+  const id = req?.user?._id;
+  const result = await UserService.getMyProfile(id as string);
   sendResponse<IUser>(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -60,12 +60,9 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const authorization = req.headers.authorization;
+  const id = req?.user?._id;
   const updatedData = req.body;
-  const result = await UserService.updateMyProfile(
-    authorization as string,
-    updatedData
-  );
+  const result = await UserService.updateMyProfile(id as string, updatedData);
   sendResponse<IUser>(res, {
     success: true,
     statusCode: httpStatus.OK,

@@ -1,4 +1,4 @@
-import { startSession } from 'mongoose';
+import mongoose, { startSession } from 'mongoose';
 import { IOrder } from './order.interface';
 import { Cow } from '../cows/cow.model';
 import { User } from '../users/user.model';
@@ -64,4 +64,42 @@ const getAllOrders = async (): Promise<IOrder[] | null> => {
   return result;
 };
 
-export const OrderService = { createOrder, getAllOrders };
+const getOrderById = async (
+  orderId: string,
+  userId: string,
+  role: string
+): Promise<IOrder[] | null> => {
+  let result: IOrder[] | null = null;
+  const isExistOrder = await Order.findById(orderId);
+  if (!isExistOrder) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Order not found');
+  }
+  if (isExistOrder && role === 'admin') {
+    result = await Order.find().populate('buyer').populate('cow');
+  } else if (isExistOrder && role === 'buyer') {
+    if (isExistOrder.buyer !== new mongoose.Types.ObjectId(userId)) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'your order not found');
+    }
+    result = await Order.findOne({ _id: orderId, buyer: userId })
+      .populate('buyer')
+      .populate('cow');
+  } else if (isExistOrder && role === 'seller') {
+    const cow = await Cow.findOne({ _id: isExistOrder?.cow?._id });
+    if (!cow) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Cow not found');
+    }
+    if (cow?.seller !== new mongoose.Types.ObjectId(userId)) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        'You are not authorized to perform this action'
+      );
+    } else {
+      result = await Order.findOne({ _id: orderId })
+        .populate('buyer')
+        .populate('cow');
+    }
+  }
+  return result;
+};
+
+export const OrderService = { createOrder, getAllOrders, getOrderById };

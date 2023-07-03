@@ -18,7 +18,7 @@ const userSchema = new Schema<IUser, Record<string, never>, IUserLoginMethod>(
         lastName: { type: String, required: true },
       },
     },
-    phoneNumber: { type: String, required: true },
+    phoneNumber: { type: String, required: true, unique: true },
     address: { type: String, required: true },
     budget: { type: Number, required: true, default: 0 },
     income: { type: Number, required: true, default: 0 },

@@ -76,6 +76,7 @@ const getAllOrders = async (
   role: string
 ): Promise<IOrder[] | IOrder | null> => {
   let result = null;
+
   if (role === 'admin') {
     result = await Order.find({})
       .populate('buyer')
@@ -83,12 +84,20 @@ const getAllOrders = async (
       .populate('cow');
   }
   if (role === 'buyer') {
+    const isOrrderExist = await Order.findOne({ buyer: userId });
+    if (!isOrrderExist) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Your data is not found!');
+    }
     result = await Order.find({ buyer: userId })
       .populate('buyer')
       .populate('seller')
       .populate('cow');
   }
   if (role === 'seller') {
+    const isOrrderExist = await Order.findOne({ seller: userId });
+    if (!isOrrderExist) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Your data is not found!');
+    }
     result = await Order.findOne({ seller: userId })
       .populate('buyer')
       .populate('seller')

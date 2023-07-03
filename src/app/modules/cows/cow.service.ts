@@ -84,6 +84,9 @@ const getAllCows = async (
 
 const getSingleCow = async (id: string): Promise<ICow | null> => {
   const result = await Cow.findById(id).populate('seller');
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Cow not found!');
+  }
   return result;
 };
 

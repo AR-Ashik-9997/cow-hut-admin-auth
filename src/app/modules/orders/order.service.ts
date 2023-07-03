@@ -86,7 +86,7 @@ const getAllOrders = async (
   if (role === 'buyer') {
     const isOrrderExist = await Order.findOne({ buyer: userId });
     if (!isOrrderExist) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Your data is not found!');
+      throw new ApiError(httpStatus.NOT_FOUND, 'data not found!');
     }
     result = await Order.find({ buyer: userId })
       .populate('buyer')
@@ -96,7 +96,7 @@ const getAllOrders = async (
   if (role === 'seller') {
     const isOrrderExist = await Order.findOne({ seller: userId });
     if (!isOrrderExist) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Your data is not found!');
+      throw new ApiError(httpStatus.NOT_FOUND, 'data not found!');
     }
     result = await Order.findOne({ seller: userId })
       .populate('buyer')
@@ -120,7 +120,7 @@ const getOrderById = async (
     result = await Order.find().populate('buyer').populate('cow');
   } else if (isExistOrder && role === 'buyer') {
     if (isExistOrder && !isExistOrder.buyer.equals(userId)) {
-      throw new ApiError(httpStatus.FORBIDDEN, 'your order not found');
+      throw new ApiError(httpStatus.FORBIDDEN, 'Order not found');
     }
     result = await Order.findOne({ _id: orderId })
       .populate('buyer')
@@ -130,7 +130,7 @@ const getOrderById = async (
     if (isExistOrder && !isExistOrder.seller.equals(userId)) {
       throw new ApiError(
         httpStatus.FORBIDDEN,
-        'You are not authorized to perform this action'
+        'Sorry! The buyer has not ordered your cow.'
       );
     } else {
       result = await Order.findOne({ _id: orderId })

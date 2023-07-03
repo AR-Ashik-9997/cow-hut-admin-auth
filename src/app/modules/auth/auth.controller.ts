@@ -49,7 +49,7 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   sendResponse<IRefreshTokenResponse>(res, {
     statusCode: 200,
     success: true,
-    message: 'User loggedin successfully !',
+    message: 'New access token generated successfully !',
     data: result,
   });
 });

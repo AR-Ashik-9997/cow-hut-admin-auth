@@ -19,7 +19,7 @@ const adminSchema = new Schema<IAdmin, Record<string, never>, ILoginMethod>(
         lastName: { type: String, required: true },
       },
     },
-    phoneNumber: { type: String, required: true },
+    phoneNumber: { type: String, required: true, unique: true },
     address: { type: String, required: true },
   },
   {
